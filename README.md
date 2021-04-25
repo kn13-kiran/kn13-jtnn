@@ -1,9 +1,7 @@
 # Junction Tree Variational Autoencoder for Molecular Graph Generation
 
-Official implementation of our Junction Tree Variational Autoencoder [https://arxiv.org/abs/1802.04364](https://arxiv.org/abs/1802.04364)
+Partial implementation (molecule generation only) for Junction Tree Variational Autoencoder [https://arxiv.org/abs/1802.04364](https://arxiv.org/abs/1802.04364). Some of the reference code is borrowed from https://github.com/wengong-jin/icml18-jtnn
 
-# Accelerated Version
-We have accelerated our code! The new code is in `model/`, and the VAE training script is in `fast_molvae/`. Please refer to `fast_molvae/README.md` for details.
 
 # Requirements
 * Linux (We only tested on Ubuntu)
@@ -13,19 +11,10 @@ We have accelerated our code! The new code is in `model/`, and the VAE training 
 
 To install RDKit, please follow the instructions here [http://www.rdkit.org/docs/Install.html](http://www.rdkit.org/docs/Install.html)
 
-We highly recommend you to use conda for package management.
-
 # Quick Start
 The following directories contains the most up-to-date implementations of our model:
-* `model/` contains codes for model implementation.
-* `fast_molvae/` contains codes for VAE training. Please refer to `fast_molvae/README.md` for details.
+* `model/` contains code for model implementation.
+* `train/` contains code for  training. Please refer to `train/README.md` for details.
 
 The following directories provides scripts for the experiments in our original ICML paper:
-* `bo/` includes scripts for Bayesian optimization experiments. Please read `bo/README.md` for details.
-* `molvae/` includes scripts for training our VAE model only. Please read `molvae/README.md` for training our VAE model.
-* `molopt/` includes scripts for jointly training our VAE and property predictors. Please read `molopt/README.md` for details.
-* `jtnn/` contains codes for model formulation.
 
-
-# Contact
-Wengong Jin (wengong@csail.mit.edu)
