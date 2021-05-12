@@ -4,7 +4,7 @@ Partial implementation (molecule generation only) for Junction Tree Variational 
 
 
 # Requirements
-* Linux (We only tested on Ubuntu)
+* Mac OS Cataliina (I've tested this on Mac)
 * RDKit (version >= 2017.09)
 * Python (version == 2.7)
 * PyTorch (version >= 0.2)
