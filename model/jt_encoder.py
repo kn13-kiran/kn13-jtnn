@@ -27,7 +27,7 @@ class JunctionTreeEncoder(nn.Module):
         mess_graph = create_var(mess_graph)
         messages = create_var(torch.zeros(mess_graph.size(0), self.hidden_size))
 
-        print(node_graph.shape, mess_graph.shape)
+        #print(node_graph.shape, mess_graph.shape)
 
         fnode = self.embedding(fnode)
         fmess = index_select_ND(fnode, 0, fmess)
@@ -131,5 +131,3 @@ class GraphGRU(nn.Module):
             h = h * mask
 
         return h
-
-

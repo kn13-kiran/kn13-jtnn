@@ -188,6 +188,7 @@ class JunctionTreeDecoder(nn.Module):
         return pred_loss, stop_loss, pred_acc.item(), stop_acc.item()
     
     def decode(self, x_tree_vecs, prob_decode):
+        #print('decoder',x_tree_vecs.shape)
         assert x_tree_vecs.size(0) == 1
 
         stack = []

@@ -49,7 +49,9 @@ class JunctionTreeVariationalEncoder(nn.Module):
         tree_batch = [MoleculeTree(s) for s in smiles_list]
         _, jtenc_holder, mpn_holder = tensorize(tree_batch, self.vocab, assm=False)
         tree_vecs, _, mol_vecs = self.encode(jtenc_holder, mpn_holder)
-        return torch.cat([tree_vecs, mol_vecs], dim=-1)
+        result = torch.cat([tree_vecs, mol_vecs], dim=-1)
+        #print('returning result..',result.shape,tree_vecs.shape,mol_vecs.shape)
+        return result,tree_vecs,mol_vecs
 
     def encode_latent(self, jtenc_holder, mpn_holder):
         tree_vecs, _ = self.jtnn(*jtenc_holder)
@@ -70,11 +72,9 @@ class JunctionTreeVariationalEncoder(nn.Module):
         return z_vecs, kl_loss
 
     def sample_prior(self, prob_decode=False):
-        #z_tree = torch.randn(1, self.latent_size).cuda()
-        #z_mol = torch.randn(1, self.latent_size).cuda()
         z_tree = torch.randn(1, self.latent_size)
         z_mol = torch.randn(1, self.latent_size)
-
+        #print('sample decode',z_tree.shape,z_mol.shape)
         return self.decode(z_tree, z_mol, prob_decode)
 
     def forward(self, x_batch, beta):
@@ -125,6 +125,7 @@ class JunctionTreeVariationalEncoder(nn.Module):
 
     def decode(self, x_tree_vecs, x_mol_vecs, prob_decode):
         #currently do not support batch decoding
+        #print('JTVAE DECOE',x_tree_vecs.shape,x_mol_vecs.shape,prob_decode)
         assert x_tree_vecs.size(0) == 1 and x_mol_vecs.size(0) == 1
 
         pred_root,pred_nodes = self.decoder.decode(x_tree_vecs, prob_decode)
@@ -231,3 +232,23 @@ class JunctionTreeVariationalEncoder(nn.Module):
             if not has_error: return cur_mol, cur_mol
 
         return None, pre_mol
+
+    def reconstruct(self, smiles, prob_decode=False):
+        mol_tree = MoleculeTree(smiles)
+        mol_tree.recover()
+        smiles_list=[]
+        smiles_list.append(smiles)
+        #print(smiles_list)
+        _, tree_vec, mol_vec = self.encode_from_smiles(smiles_list)
+        #print('tvec',smiles,tree_vec.shape,mol_vec.shape)
+        tree_mean = self.T_mean(tree_vec)
+        tree_log_var = -torch.abs(self.T_var(tree_vec))  # Following Mueller et al.
+        mol_mean = self.G_mean(mol_vec)
+        mol_log_var = -torch.abs(self.G_var(mol_vec))  # Following Mueller et al.
+
+        epsilon = create_var(torch.randn(1, self.latent_size), False)
+        #print('epsilon',tree_mean.shape,tree_log_var.shape,epsilon.shape,self.latent_size)
+        tree_vec = tree_mean + torch.exp(tree_log_var / 2) * epsilon
+        epsilon = create_var(torch.randn(1, self.latent_size ), False)
+        mol_vec = mol_mean + torch.exp(mol_log_var / 2) * epsilon
+        return self.decode(tree_vec, mol_vec, prob_decode)

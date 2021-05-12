@@ -5,6 +5,7 @@ import math, random, sys
 import argparse
 from model import *
 import rdkit
+import rdkit.Chem as Chem
 
 lg = rdkit.RDLogger.logger() 
 lg.setLevel(rdkit.RDLogger.CRITICAL)
@@ -26,8 +27,20 @@ vocab = Vocab(vocab)
 
 model = JunctionTreeVariationalEncoder(vocab, args.hidden_size, args.latent_size, args.depthT, args.depthG)
 model.load_state_dict(torch.load(args.model))
-model = model
 
+#set the seed for random number generator
 torch.manual_seed(0)
+
+acc=0
+gen=0
 for i in xrange(args.nsample):
-    print model.sample_prior()
+    smiles= model.sample_prior()
+    print(smiles)
+    gen +=1
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        smiles3D = Chem.MolToSmiles(mol, isomericSmiles=True)
+        acc+=1
+    except:
+        print('Invalid smiles')
+print("Sample generation Acuracy",(gen/acc))
